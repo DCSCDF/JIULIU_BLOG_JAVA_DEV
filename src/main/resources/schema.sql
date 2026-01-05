@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS sys_user (
                                         username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
     email VARCHAR(50),
+    avatar_url VARCHAR(50),
     status INT DEFAULT 1,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

@@ -129,7 +129,7 @@ public class LoginController {
         profile.put("email", user.getEmail());
         profile.put("createTime", user.getCreateTime());
         profile.put("updateTime", user.getUpdateTime());
-
+        profile.put("avatarUrl", user.getAvatarUrl());
         return getSuccessResponse(profile);
     }
 
