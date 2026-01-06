@@ -51,7 +51,7 @@ public class LoginController {
 
     // 获取当前公钥
     @GetMapping("/public-key")
-    @RateLimit(count = 10, period = 800) // （按IP+方法）
+    @RateLimit(count = 10, period = 800) //访问频繁限制
     public Map<String, Object> getPublicKey() {
         Map<String, Object> data = new HashMap<>();
         data.put("publicKey", rsaKeyConfig.getPublicKeyBase64());
@@ -60,7 +60,7 @@ public class LoginController {
 
 
     @PostMapping("/login")
-    @RateLimit(count = 10, period = 800) // （按IP+方法）
+    @RateLimit(count = 10, period = 800)
     public Map<String, Object> login(@RequestBody LoginDTO dto) {
         String username = dto.getUsername();
         String encryptedPassword = dto.getPassword(); // 注意：现在是加密后的 Base64 字符串
