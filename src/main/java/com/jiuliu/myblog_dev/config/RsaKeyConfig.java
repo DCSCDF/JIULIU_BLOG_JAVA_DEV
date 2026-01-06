@@ -1,6 +1,8 @@
 package com.jiuliu.myblog_dev.config;
 
-
+import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 import java.security.KeyPair;
@@ -12,8 +14,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
+@Getter // Lombok 自动生成 getter 方法
 public class RsaKeyConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(RsaKeyConfig.class);
     private static final int KEY_SIZE = 2048;
     private static final long REFRESH_INTERVAL_HOURS = 3;
 
@@ -39,17 +43,12 @@ public class RsaKeyConfig {
             this.publicKeyBase64 = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
             this.privateKeyBase64 = Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded());
 
-            System.out.println("✅ RSA 密钥已刷新");
+
+            log.info("RSA 密钥已刷新 (有效期: {} 小时)", REFRESH_INTERVAL_HOURS);
         } catch (NoSuchAlgorithmException e) {
+            // 记录异常但不泄露密钥
+            log.error("RSA 密钥生成失败: {}", e.getMessage(), e);
             throw new RuntimeException("无法生成 RSA 密钥对", e);
         }
-    }
-
-    public String getPublicKeyBase64() {
-        return publicKeyBase64;
-    }
-
-    public String getPrivateKeyBase64() {
-        return privateKeyBase64;
     }
 }

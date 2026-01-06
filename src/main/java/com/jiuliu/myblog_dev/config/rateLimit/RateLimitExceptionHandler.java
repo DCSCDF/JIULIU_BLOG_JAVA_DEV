@@ -14,6 +14,7 @@ import java.util.Map;
 public class RateLimitExceptionHandler {
 
     @ExceptionHandler(RateLimitException.class)
+    @SuppressWarnings("unused")
     public ResponseEntity<Map<String, Object>> handleRateLimitException(RateLimitException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
@@ -24,4 +25,7 @@ public class RateLimitExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.TOO_MANY_REQUESTS);
     }
+
+
+
 }
