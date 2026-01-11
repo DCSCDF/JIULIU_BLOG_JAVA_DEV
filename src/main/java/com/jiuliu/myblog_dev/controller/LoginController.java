@@ -1,6 +1,5 @@
 package com.jiuliu.myblog_dev.controller;
 
-
 import cn.dev33.satoken.stp.StpUtil;
 import com.jiuliu.myblog_dev.config.RsaKeyConfig;
 import com.jiuliu.myblog_dev.config.rateLimit.RateLimit;
@@ -10,12 +9,11 @@ import com.jiuliu.myblog_dev.mapper.SysUserMapper;
 import com.jiuliu.myblog_dev.utils.RsaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
+
 import java.util.HashMap;
 import java.util.Map;
-
-
 
 @RestController
 @RequestMapping("/user")
@@ -48,39 +46,45 @@ public class LoginController {
         return result;
     }
 
-
     // 获取当前公钥
     @GetMapping("/public-key")
-    @RateLimit(count = 10, period = 800) //访问频繁限制
+//    @RateLimit(count = 10, period = 800)
     public Map<String, Object> getPublicKey() {
         Map<String, Object> data = new HashMap<>();
         data.put("publicKey", rsaKeyConfig.getPublicKeyBase64());
         return getSuccessResponse(data);
     }
 
-
     @PostMapping("/login")
     @RateLimit(count = 10, period = 800)
     public Map<String, Object> login(@RequestBody LoginDTO dto) {
         String username = dto.getUsername();
-        String encryptedPassword = dto.getPassword(); // 注意：现在是加密后的 Base64 字符串
+        String encryptedPassword = dto.getPassword();
 
-        if (username == null || encryptedPassword == null) {
-            return getErrorResponse("用户名或密码不能为空");
+        if (!StringUtils.hasText(username)) {
+            return getErrorResponse("用户名不能为空");
+        }
+        if (!StringUtils.hasText(encryptedPassword)) {
+            return getErrorResponse("密码不能为空");
         }
 
-        // 使用私钥解密密码
         String rawPassword;
         try {
+            // 尝试用私钥解密前端传来的加密密码
             rawPassword = RsaUtils.decryptByPrivateKey(encryptedPassword, rsaKeyConfig.getPrivateKeyBase64());
+
+            if (!StringUtils.hasText(rawPassword)) {
+                return getErrorResponse("密码格式错误");
+            }
         } catch (Exception e) {
-            return getErrorResponse("密码解密失败，请刷新页面重试");
+            // 任何解密异常（Base64非法、密文损坏、非本系统公钥加密等）都视为格式错误
+            return getErrorResponse("密码格式错误");
         }
 
         // 查询用户
         SysUser user = sysUserMapper.selectOne(
                 new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<SysUser>()
-                        .eq("username", username)
+                        .eq("username", username.trim())
         );
 
         if (user == null) {
@@ -92,10 +96,9 @@ public class LoginController {
             return getErrorResponse("密码错误");
         }
 
-        // 登录
+        // 登录成功，生成 Token
         StpUtil.login(user.getId());
 
-        // 返回安全信息（不含密码）
         Map<String, Object> result = new HashMap<>();
         result.put("token", StpUtil.getTokenValue());
         result.put("username", user.getUsername());
@@ -104,22 +107,17 @@ public class LoginController {
         return getSuccessResponse(result);
     }
 
-    //是否登陆
+    // 是否已登录
     @GetMapping("/is-logged-in")
     public Map<String, Object> isLoggedIn() {
-        if (StpUtil.isLogin()) {
-            return getSuccessResponse(Map.of("loggedIn", true));
-        } else {
-            return getSuccessResponse(Map.of("loggedIn", false));
-        }
+        boolean loggedIn = StpUtil.isLogin();
+        return getSuccessResponse(Map.of("loggedIn", loggedIn));
     }
 
-
+    // 获取用户资料
     @GetMapping("/profile")
     public Map<String, Object> getUserProfile() {
-        // 直接获取，如果未登录，Sa-Token 会自动抛出 NotLoginException
         Long userId = StpUtil.getLoginIdAsLong();
-
         SysUser user = sysUserMapper.selectById(userId);
         if (user == null) {
             return getErrorResponse("用户不存在");
@@ -132,7 +130,31 @@ public class LoginController {
         profile.put("createTime", user.getCreateTime());
         profile.put("updateTime", user.getUpdateTime());
         profile.put("avatarUrl", user.getAvatarUrl());
+
         return getSuccessResponse(profile);
     }
 
+    @PostMapping("/logout")
+    public Map<String, Object> logout() {
+        //  检查登录状态
+        if (!StpUtil.isLogin()) {
+            return getErrorResponse("用户未登录");
+        }
+
+        try {
+            // 执行登出
+            StpUtil.logout();
+
+            // 创建响应数据
+            Map<String, Object> data = new HashMap<>();
+            data.put("message", "登出成功");
+            data.put("logoutTime", System.currentTimeMillis());
+
+            // 返回成功响应
+            return getSuccessResponse(data);
+        } catch (Exception e) {
+            // 异常处理
+            return getErrorResponse("登出失败");
+        }
+    }
 }

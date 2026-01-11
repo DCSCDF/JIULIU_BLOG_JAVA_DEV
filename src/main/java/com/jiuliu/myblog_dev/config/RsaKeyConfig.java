@@ -19,7 +19,7 @@ public class RsaKeyConfig {
 
     private static final Logger log = LoggerFactory.getLogger(RsaKeyConfig.class);
     private static final int KEY_SIZE = 2048;
-    private static final long REFRESH_INTERVAL_HOURS = 3;
+    private static final long REFRESH_INTERVAL_HOURS = 720;
 
     private String publicKeyBase64;
     private String privateKeyBase64;
@@ -29,7 +29,7 @@ public class RsaKeyConfig {
     @PostConstruct
     public void init() {
         generateKeyPair();
-        // 每 3 小时刷新一次
+        // 每 REFRESH_INTERVAL_HOURS 小时刷新一次
         scheduler.scheduleAtFixedRate(this::generateKeyPair,
                 REFRESH_INTERVAL_HOURS, REFRESH_INTERVAL_HOURS, TimeUnit.HOURS);
     }

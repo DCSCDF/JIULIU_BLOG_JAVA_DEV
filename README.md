@@ -8,7 +8,6 @@
 
 - **URL**: `/user/public-key`
 - **Method**: `GET`
-- **Rate Limit**: 每 800 毫秒最多 10 次（按 IP + 方法限流）
 - **Auth Required**: 否
 
 ### ✅ 成功响应示例
