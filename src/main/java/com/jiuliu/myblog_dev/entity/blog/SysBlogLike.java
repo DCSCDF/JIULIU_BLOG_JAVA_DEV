@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.entity.user;
+package com.jiuliu.myblog_dev.entity.blog;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -6,17 +6,17 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("sys_user_role") //用户角色关联
-public class SysUserRole {
+@TableName("sys_blog_like")//文章点赞表
+public class SysBlogLike {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    @TableField("blog_id")
+    private Long blogId;
+
     @TableField("user_id")
     private Long userId;
-
-    @TableField("role_id")
-    private Long roleId;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

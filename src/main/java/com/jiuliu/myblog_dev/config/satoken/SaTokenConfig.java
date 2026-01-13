@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.config;
+package com.jiuliu.myblog_dev.config.satoken;
 
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import org.springframework.context.annotation.Configuration;

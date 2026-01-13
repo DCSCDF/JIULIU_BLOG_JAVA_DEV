@@ -2,7 +2,11 @@ package com.jiuliu.myblog_dev.utils;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jiuliu.myblog_dev.entity.user.SysUser;
+import com.jiuliu.myblog_dev.entity.user.role.SysRole;
+import com.jiuliu.myblog_dev.entity.user.SysUserRole;
 import com.jiuliu.myblog_dev.mapper.user.SysUserMapper;
+import com.jiuliu.myblog_dev.mapper.user.SysRoleMapper;
+import com.jiuliu.myblog_dev.mapper.user.SysUserRoleMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +27,12 @@ public class DefaultAdminInitializer implements CommandLineRunner {
 
     @Autowired
     private SysUserMapper sysUserMapper;
+
+    @Autowired
+    private SysUserRoleMapper sysUserRoleMapper;
+
+    @Autowired
+    private SysRoleMapper sysRoleMapper;
 
     @Override
     @Transactional
@@ -50,14 +60,92 @@ public class DefaultAdminInitializer implements CommandLineRunner {
             SysUser sysUser = new SysUser();
             sysUser.setUsername("admin");
             sysUser.setPassword(passwordEncoder.encode("123456"));
+            sysUser.setEmail("admin@example.com");
             sysUser.setStatus(1); // 1表示启用
             sysUser.setCreateTime(LocalDateTime.now());
             sysUser.setUpdateTime(LocalDateTime.now());
 
             sysUserMapper.insert(sysUser);
             log.info("默认管理员已创建: username: admin (密码: 123456, 请首次登录后修改)");
+
+            // 为管理员分配超级管理员角色
+            assignSuperAdminRole(sysUser.getId());
         } else {
             log.info("管理员已存在，跳过初始化");
+
+            // 检查管理员是否已关联超级管理员角色
+            if (!hasSuperAdminRole(adminUser.getId())) {
+                log.info("管理员未关联超级管理员角色，正在分配...");
+                assignSuperAdminRole(adminUser.getId());
+            }
+        }
+    }
+
+    /**
+     * 为用户分配超级管理员角色
+     */
+    private void assignSuperAdminRole(Long userId) {
+        try {
+            // 查询 超级管理员角色的ID
+            QueryWrapper<SysRole> roleQuery = new QueryWrapper<>();
+            roleQuery.eq("code", "SUPER_ADMIN");
+            SysRole superAdminRole = sysRoleMapper.selectOne(roleQuery);
+
+            if (superAdminRole == null) {
+                log.error("超级管理员角色不存在，请确保数据库初始化完成");
+                return;
+            }
+
+            // 检查是否已存在关联
+            QueryWrapper<SysUserRole> userRoleQuery = new QueryWrapper<>();
+            userRoleQuery.eq("user_id", userId)
+                    .eq("role_id", superAdminRole.getId());
+            SysUserRole existingUserRole = sysUserRoleMapper.selectOne(userRoleQuery);
+
+            if (existingUserRole != null) {
+                log.info("用户已关联超级管理员角色，无需重复分配");
+                return;
+            }
+
+            // 创建用户-角色关联
+            SysUserRole sysUserRole = new SysUserRole();
+            sysUserRole.setUserId(userId);
+            sysUserRole.setRoleId(superAdminRole.getId());
+            sysUserRole.setCreateTime(LocalDateTime.now());
+
+            sysUserRoleMapper.insert(sysUserRole);
+            log.info("成功为用户分配超级管理员角色");
+
+        } catch (Exception e) {
+            log.error("分配超级管理员角色失败: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 检查用户是否已关联超级管理员角色
+     */
+    private boolean hasSuperAdminRole(Long userId) {
+        try {
+            // 查询 超级管理员角色的ID
+            QueryWrapper<SysRole> roleQuery = new QueryWrapper<>();
+            roleQuery.eq("code", "SUPER_ADMIN");
+            SysRole superAdminRole = sysRoleMapper.selectOne(roleQuery);
+
+            if (superAdminRole == null) {
+                return false;
+            }
+
+            // 检查关联
+            QueryWrapper<SysUserRole> userRoleQuery = new QueryWrapper<>();
+            userRoleQuery.eq("user_id", userId)
+                    .eq("role_id", superAdminRole.getId());
+            SysUserRole userRole = sysUserRoleMapper.selectOne(userRoleQuery);
+
+            return userRole != null;
+
+        } catch (Exception e) {
+            log.error("检查用户角色失败: {}", e.getMessage());
+            return false;
         }
     }
 

@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.entity.user;
+package com.jiuliu.myblog_dev.entity.user.role;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("sys_role")
+@TableName("sys_role") //角色
 public class SysRole {
 
     @TableId(type = IdType.AUTO)

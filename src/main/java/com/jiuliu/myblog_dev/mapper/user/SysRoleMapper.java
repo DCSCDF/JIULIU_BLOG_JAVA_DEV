@@ -1,7 +1,7 @@
 package com.jiuliu.myblog_dev.mapper.user;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jiuliu.myblog_dev.entity.user.SysRole;
+import com.jiuliu.myblog_dev.entity.user.role.SysRole;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

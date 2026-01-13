@@ -1,5 +1,4 @@
-// com.jiuliu.myblog_dev.config.SecurityConfig.java
-package com.jiuliu.myblog_dev.config;
+package com.jiuliu.myblog_dev.config.user;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

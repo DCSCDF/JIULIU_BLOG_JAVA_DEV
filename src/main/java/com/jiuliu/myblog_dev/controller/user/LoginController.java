@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.controller;
+package com.jiuliu.myblog_dev.controller.user;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.jiuliu.myblog_dev.config.user.RsaKeyConfig;

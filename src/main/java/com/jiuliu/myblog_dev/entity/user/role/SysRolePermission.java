@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.entity.user;
+package com.jiuliu.myblog_dev.entity.user.role;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -6,17 +6,17 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("sys_user_role") //用户角色关联
-public class SysUserRole {
+@TableName("sys_role_permission") //角色权限关联表
+public class SysRolePermission {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    @TableField("user_id")
-    private Long userId;
-
     @TableField("role_id")
     private Long roleId;
+
+    @TableField("permission_id")
+    private Long permissionId;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
