@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.config;
+package com.jiuliu.myblog_dev.config.user;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import org.slf4j.Logger;

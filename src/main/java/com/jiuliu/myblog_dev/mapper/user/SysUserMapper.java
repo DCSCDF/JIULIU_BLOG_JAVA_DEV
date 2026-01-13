@@ -1,8 +1,8 @@
-package com.jiuliu.myblog_dev.mapper;
+package com.jiuliu.myblog_dev.mapper.user;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jiuliu.myblog_dev.entity.SysUser;
+import com.jiuliu.myblog_dev.entity.user.SysUser;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

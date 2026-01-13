@@ -1,11 +1,11 @@
 package com.jiuliu.myblog_dev.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.jiuliu.myblog_dev.config.RsaKeyConfig;
+import com.jiuliu.myblog_dev.config.user.RsaKeyConfig;
 import com.jiuliu.myblog_dev.config.rateLimit.RateLimit;
-import com.jiuliu.myblog_dev.dto.LoginDTO;
-import com.jiuliu.myblog_dev.entity.SysUser;
-import com.jiuliu.myblog_dev.mapper.SysUserMapper;
+import com.jiuliu.myblog_dev.dto.user.LoginDTO;
+import com.jiuliu.myblog_dev.entity.user.SysUser;
+import com.jiuliu.myblog_dev.mapper.user.SysUserMapper;
 import com.jiuliu.myblog_dev.utils.RsaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,7 +48,7 @@ public class LoginController {
 
     // 获取当前公钥
     @GetMapping("/public-key")
-//    @RateLimit(count = 10, period = 800)
+    //    @RateLimit(count = 10, period = 800)
     public Map<String, Object> getPublicKey() {
         Map<String, Object> data = new HashMap<>();
         data.put("publicKey", rsaKeyConfig.getPublicKeyBase64());
