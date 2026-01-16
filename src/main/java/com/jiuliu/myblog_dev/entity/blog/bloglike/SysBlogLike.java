@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.entity.blog;
+package com.jiuliu.myblog_dev.entity.blog.bloglike;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;

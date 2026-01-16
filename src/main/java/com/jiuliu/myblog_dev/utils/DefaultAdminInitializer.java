@@ -5,7 +5,7 @@ import com.jiuliu.myblog_dev.entity.user.SysUser;
 import com.jiuliu.myblog_dev.entity.user.role.SysRole;
 import com.jiuliu.myblog_dev.entity.user.SysUserRole;
 import com.jiuliu.myblog_dev.mapper.user.SysUserMapper;
-import com.jiuliu.myblog_dev.mapper.user.SysRoleMapper;
+import com.jiuliu.myblog_dev.mapper.user.role.SysRoleMapper;
 import com.jiuliu.myblog_dev.mapper.user.SysUserRoleMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,14 +59,15 @@ public class DefaultAdminInitializer implements CommandLineRunner {
             // 创建管理员
             SysUser sysUser = new SysUser();
             sysUser.setUsername("admin");
-            sysUser.setPassword(passwordEncoder.encode("123456"));
+            sysUser.setNickname("管理员");
+            sysUser.setPassword(passwordEncoder.encode("a123456"));
             sysUser.setEmail("admin@example.com");
             sysUser.setStatus(1); // 1表示启用
             sysUser.setCreateTime(LocalDateTime.now());
             sysUser.setUpdateTime(LocalDateTime.now());
 
             sysUserMapper.insert(sysUser);
-            log.info("默认管理员已创建: username: admin (密码: 123456, 请首次登录后修改)");
+            log.info("默认管理员已创建: username: admin (密码: a123456, 请首次登录后修改)");
 
             // 为管理员分配超级管理员角色
             assignSuperAdminRole(sysUser.getId());

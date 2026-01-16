@@ -7,6 +7,7 @@ USE myblog_sql;
 CREATE TABLE IF NOT EXISTS sys_user (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
     username VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
+    nickname VARCHAR(50) NOT NULL COMMENT '昵称',
     password VARCHAR(100) NOT NULL COMMENT '密码（加密后）',
     email VARCHAR(50) UNIQUE COMMENT '邮箱（唯一）',
     avatar_url VARCHAR(200) COMMENT '头像URL',
@@ -172,7 +173,6 @@ CREATE TABLE IF NOT EXISTS sys_comment_like (
     comment_id BIGINT NOT NULL COMMENT '评论ID',
     user_id BIGINT NOT NULL COMMENT '用户ID',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-
     UNIQUE KEY uk_comment_user (comment_id, user_id) COMMENT '防止重复点赞',
     FOREIGN KEY (comment_id) REFERENCES sys_comment(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES sys_user(id) ON DELETE CASCADE
@@ -210,7 +210,7 @@ CREATE TABLE IF NOT EXISTS sys_blog_like (
     FOREIGN KEY (user_id) REFERENCES sys_user(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章点赞表';
 
--- 删除已存在的索引
+-- 创建索引 删除已存在的索引
 DROP INDEX IF EXISTS idx_user_status ON sys_user;
 DROP INDEX IF EXISTS idx_role_code ON sys_role;
 DROP INDEX IF EXISTS idx_role_status ON sys_role;
@@ -238,7 +238,7 @@ DROP INDEX IF EXISTS idx_comment_create_time ON sys_comment;
 DROP INDEX IF EXISTS idx_comment_like_comment ON sys_comment_like;
 DROP INDEX IF EXISTS idx_comment_like_user ON sys_comment_like;
 
--- 创建索引
+-- 创建新索引
 CREATE INDEX idx_user_status ON sys_user(status) COMMENT '用户状态索引';
 CREATE INDEX idx_role_code ON sys_role(code) COMMENT '角色编码索引';
 CREATE INDEX idx_role_status ON sys_role(status) COMMENT '角色状态索引';
@@ -266,78 +266,171 @@ CREATE INDEX idx_comment_create_time ON sys_comment(create_time) COMMENT '评论
 CREATE INDEX idx_comment_like_comment ON sys_comment_like(comment_id) COMMENT '点赞评论索引';
 CREATE INDEX idx_comment_like_user ON sys_comment_like(user_id) COMMENT '点赞用户索引';
 
--- 插入默认数据 - 使用 INSERT IGNORE 避免重复插入
--- 1. 插入默认角色
-INSERT IGNORE INTO sys_role (code, name, description, is_super_admin, is_system, sort_order, status) VALUES
-('SUPER_ADMIN', '超级管理员', '拥有系统所有权限，只能有一个', 1, 1, 100, 1),
-('ADMIN', '普通管理员', '拥有系统大部分管理权限', 0, 1, 90, 1),
-('AUTHOR', '文章作者', '可以发布和管理自己的文章', 0, 1, 80, 1),
-('USER', '普通用户', '可以评论、点赞、收藏文章', 0, 1, 70, 1);
 
--- 2. 插入默认权限
+-- 插入默认角色
+INSERT IGNORE INTO sys_role (code, name, description, is_super_admin, is_system, sort_order, status)
+SELECT 'SUPER_ADMIN', '超级管理员', '拥有系统所有权限，只能有一个', 1, 1, 100, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'SUPER_ADMIN');
+
+INSERT IGNORE INTO sys_role (code, name, description, is_super_admin, is_system, sort_order, status)
+SELECT 'ADMIN', '普通管理员', '拥有系统大部分管理权限', 0, 1, 90, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'ADMIN');
+
+INSERT IGNORE INTO sys_role (code, name, description, is_super_admin, is_system, sort_order, status)
+SELECT 'AUTHOR', '文章作者', '可以发布和管理自己的文章', 0, 1, 80, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'AUTHOR');
+
+INSERT IGNORE INTO sys_role (code, name, description, is_super_admin, is_system, sort_order, status)
+SELECT 'USER', '普通用户', '可以评论、点赞、收藏文章', 0, 1, 70, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_role WHERE code = 'USER');
+
+-- 插入默认权限
 -- 系统管理权限
-INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order) VALUES
-(0, 'system', '系统管理', 'MENU', '系统管理菜单', 100),
-(1, 'system:user', '用户管理', 'MENU', '用户管理', 101),
-(1, 'system:role', '角色管理', 'MENU', '角色管理', 102),
-(1, 'system:permission', '权限管理', 'MENU', '权限管理', 103);
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 0, 'system', '系统管理', 'MENU', '系统管理菜单', 100
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 1, 'system:user', '用户管理', 'MENU', '用户管理', 101
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:user');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 1, 'system:role', '角色管理', 'MENU', '角色管理', 102
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:role');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 1, 'system:permission', '权限管理', 'MENU', '权限管理', 103
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:permission');
 
 -- 用户管理权限
-INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order) VALUES
-(2, 'system:user:list', '用户列表', 'API', '查看用户列表', 1),
-(2, 'system:user:create', '创建用户', 'API', '创建用户', 2),
-(2, 'system:user:edit', '编辑用户', 'API', '编辑用户', 3),
-(2, 'system:user:delete', '删除用户', 'API', '删除用户', 4),
-(2, 'system:user:assignRole', '分配角色', 'API', '为用户分配角色', 5);
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 2, 'system:user:list', '用户列表', 'API', '查看用户列表', 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:user:list');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 2, 'system:user:create', '创建用户', 'API', '创建用户', 2
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:user:create');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 2, 'system:user:edit', '编辑用户', 'API', '编辑用户', 3
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:user:edit');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 2, 'system:user:delete', '删除用户', 'API', '删除用户', 4
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:user:delete');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 2, 'system:user:assignRole', '分配角色', 'API', '为用户分配角色', 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:user:assignRole');
 
 -- 角色管理权限
-INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order) VALUES
-(3, 'system:role:list', '角色列表', 'API', '查看角色列表', 1),
-(3, 'system:role:create', '创建角色', 'API', '创建角色', 2),
-(3, 'system:role:edit', '编辑角色', 'API', '编辑角色', 3),
-(3, 'system:role:delete', '删除角色', 'API', '删除角色', 4),
-(3, 'system:role:assignPermission', '分配权限', 'API', '为角色分配权限', 5);
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 3, 'system:role:list', '角色列表', 'API', '查看角色列表', 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:role:list');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 3, 'system:role:create', '创建角色', 'API', '创建角色', 2
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:role:create');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 3, 'system:role:edit', '编辑角色', 'API', '编辑角色', 3
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:role:edit');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 3, 'system:role:delete', '删除角色', 'API', '删除角色', 4
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:role:delete');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 3, 'system:role:assignPermission', '分配权限', 'API', '为角色分配权限', 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'system:role:assignPermission');
 
 -- 文章管理权限
-INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order) VALUES
-(0, 'article', '文章管理', 'MENU', '文章管理菜单', 90),
-(15, 'article:list', '文章列表', 'API', '查看文章列表', 1),
-(15, 'article:create', '创建文章', 'API', '创建文章', 2),
-(15, 'article:edit', '编辑文章', 'API', '编辑文章', 3),
-(15, 'article:delete', '删除文章', 'API', '删除文章', 4),
-(15, 'article:publish', '发布文章', 'API', '发布文章', 5);
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 0, 'article', '文章管理', 'MENU', '文章管理菜单', 90
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'article');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 15, 'article:list', '文章列表', 'API', '查看文章列表', 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'article:list');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 15, 'article:create', '创建文章', 'API', '创建文章', 2
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'article:create');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 15, 'article:edit', '编辑文章', 'API', '编辑文章', 3
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'article:edit');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 15, 'article:delete', '删除文章', 'API', '删除文章', 4
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'article:delete');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 15, 'article:publish', '发布文章', 'API', '发布文章', 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'article:publish');
 
 -- 分类管理权限
-INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order) VALUES
-(0, 'category', '分类管理', 'MENU', '分类管理菜单', 80),
-(22, 'category:list', '分类列表', 'API', '查看分类列表', 1),
-(22, 'category:create', '创建分类', 'API', '创建分类', 2),
-(22, 'category:edit', '编辑分类', 'API', '编辑分类', 3),
-(22, 'category:delete', '删除分类', 'API', '删除分类', 4);
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 0, 'category', '分类管理', 'MENU', '分类管理菜单', 80
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'category');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 22, 'category:list', '分类列表', 'API', '查看分类列表', 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'category:list');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 22, 'category:create', '创建分类', 'API', '创建分类', 2
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'category:create');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 22, 'category:edit', '编辑分类', 'API', '编辑分类', 3
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'category:edit');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 22, 'category:delete', '删除分类', 'API', '删除分类', 4
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'category:delete');
 
 -- 评论管理权限
-INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order) VALUES
-(0, 'comment', '评论管理', 'MENU', '评论管理菜单', 70),
-(27, 'comment:list', '评论列表', 'API', '查看评论列表', 1),
-(27, 'comment:create', '创建评论', 'API', '创建评论', 2),
-(27, 'comment:edit', '编辑评论', 'API', '编辑评论', 3),
-(27, 'comment:delete', '删除评论', 'API', '删除评论', 4),
-(27, 'comment:approve', '审核评论', 'API', '审核评论', 5);
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 0, 'comment', '评论管理', 'MENU', '评论管理菜单', 70
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'comment');
 
--- 3. 为超级管理员角色分配所有权限
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 27, 'comment:list', '评论列表', 'API', '查看评论列表', 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'comment:list');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 27, 'comment:create', '创建评论', 'API', '创建评论', 2
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'comment:create');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 27, 'comment:edit', '编辑评论', 'API', '编辑评论', 3
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'comment:edit');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 27, 'comment:delete', '删除评论', 'API', '删除评论', 4
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'comment:delete');
+
+INSERT IGNORE INTO sys_permission (parent_id, code, name, type, description, sort_order)
+SELECT 27, 'comment:approve', '审核评论', 'API', '审核评论', 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission WHERE code = 'comment:approve');
+
+-- 为超级管理员角色分配所有权限（使用NOT EXISTS检查）
 INSERT IGNORE INTO sys_role_permission (role_id, permission_id)
 SELECT r.id, p.id
-FROM sys_role r, sys_permission p
+FROM sys_role r
+         CROSS JOIN sys_permission p
 WHERE r.code = 'SUPER_ADMIN'
   AND NOT EXISTS (
     SELECT 1 FROM sys_role_permission rp
     WHERE rp.role_id = r.id AND rp.permission_id = p.id
 );
 
--- 4. 为普通管理员角色分配基本管理权限
+-- 为普通管理员角色分配基本管理权限
 INSERT IGNORE INTO sys_role_permission (role_id, permission_id)
 SELECT r.id, p.id
-FROM sys_role r, sys_permission p
+FROM sys_role r
+         CROSS JOIN sys_permission p
 WHERE r.code = 'ADMIN'
   AND p.code NOT LIKE 'system:permission%'
   AND p.code NOT LIKE 'system:role:assignPermission%'
@@ -346,10 +439,11 @@ WHERE r.code = 'ADMIN'
     WHERE rp.role_id = r.id AND rp.permission_id = p.id
 );
 
--- 5. 为作者角色分配文章相关权限
+-- 为作者角色分配文章相关权限
 INSERT IGNORE INTO sys_role_permission (role_id, permission_id)
 SELECT r.id, p.id
-FROM sys_role r, sys_permission p
+FROM sys_role r
+         CROSS JOIN sys_permission p
 WHERE r.code = 'AUTHOR'
   AND (p.code LIKE 'article:%' OR p.code LIKE 'category:list%')
   AND NOT EXISTS (
@@ -357,10 +451,11 @@ WHERE r.code = 'AUTHOR'
     WHERE rp.role_id = r.id AND rp.permission_id = p.id
 );
 
--- 6. 为普通用户角色分配基本权限
+-- 为普通用户角色分配基本权限
 INSERT IGNORE INTO sys_role_permission (role_id, permission_id)
 SELECT r.id, p.id
-FROM sys_role r, sys_permission p
+FROM sys_role r
+         CROSS JOIN sys_permission p
 WHERE r.code = 'USER'
   AND (p.code IN ('article:list', 'comment:create', 'comment:list'))
   AND NOT EXISTS (
@@ -368,18 +463,27 @@ WHERE r.code = 'USER'
     WHERE rp.role_id = r.id AND rp.permission_id = p.id
 );
 
--- 7. 插入默认权限组
-INSERT IGNORE INTO sys_permission_group (name, description, sort_order, status) VALUES
-('系统管理组', '包含所有系统管理权限', 100, 1),
-('文章管理组', '包含所有文章管理权限', 90, 1),
-('用户管理组', '包含用户管理相关权限', 80, 1);
+-- 插入默认权限组
+INSERT IGNORE INTO sys_permission_group (name, description, sort_order, status)
+SELECT '系统管理组', '包含所有系统管理权限', 100, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission_group WHERE name = '系统管理组');
 
--- 8. 为权限组添加权限
+INSERT IGNORE INTO sys_permission_group (name, description, sort_order, status)
+SELECT '文章管理组', '包含所有文章管理权限', 90, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission_group WHERE name = '文章管理组');
+
+INSERT IGNORE INTO sys_permission_group (name, description, sort_order, status)
+SELECT '用户管理组', '包含用户管理相关权限', 80, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM sys_permission_group WHERE name = '用户管理组');
+
+-- 为权限组添加权限
 -- 系统管理组权限
 INSERT IGNORE INTO sys_permission_group_item (group_id, permission_id, sort_order)
 SELECT g.id, p.id, 1
-FROM sys_permission_group g, sys_permission p
-WHERE g.name = '系统管理组' AND p.code LIKE 'system:%'
+FROM sys_permission_group g
+         CROSS JOIN sys_permission p
+WHERE g.name = '系统管理组'
+  AND p.code LIKE 'system:%'
   AND NOT EXISTS (
     SELECT 1 FROM sys_permission_group_item pgi
     WHERE pgi.group_id = g.id AND pgi.permission_id = p.id
@@ -388,8 +492,10 @@ WHERE g.name = '系统管理组' AND p.code LIKE 'system:%'
 -- 文章管理组权限
 INSERT IGNORE INTO sys_permission_group_item (group_id, permission_id, sort_order)
 SELECT g.id, p.id, 1
-FROM sys_permission_group g, sys_permission p
-WHERE g.name = '文章管理组' AND p.code LIKE 'article:%'
+FROM sys_permission_group g
+         CROSS JOIN sys_permission p
+WHERE g.name = '文章管理组'
+  AND p.code LIKE 'article:%'
   AND NOT EXISTS (
     SELECT 1 FROM sys_permission_group_item pgi
     WHERE pgi.group_id = g.id AND pgi.permission_id = p.id
@@ -398,20 +504,22 @@ WHERE g.name = '文章管理组' AND p.code LIKE 'article:%'
 -- 用户管理组权限
 INSERT IGNORE INTO sys_permission_group_item (group_id, permission_id, sort_order)
 SELECT g.id, p.id, 1
-FROM sys_permission_group g, sys_permission p
-WHERE g.name = '用户管理组' AND p.code LIKE 'system:user:%'
+FROM sys_permission_group g
+         CROSS JOIN sys_permission p
+WHERE g.name = '用户管理组'
+  AND p.code LIKE 'system:user:%'
   AND NOT EXISTS (
     SELECT 1 FROM sys_permission_group_item pgi
     WHERE pgi.group_id = g.id AND pgi.permission_id = p.id
 );
 
--- 9. 为角色分配权限组
+-- 为角色分配权限组
 INSERT IGNORE INTO sys_role_permission_group (role_id, group_id)
 SELECT r.id, g.id
-FROM sys_role r, sys_permission_group g
+FROM sys_role r
+         CROSS JOIN sys_permission_group g
 WHERE r.code = 'ADMIN'
   AND NOT EXISTS (
     SELECT 1 FROM sys_role_permission_group rpg
     WHERE rpg.role_id = r.id AND rpg.group_id = g.id
 );
-

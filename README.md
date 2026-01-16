@@ -6,12 +6,12 @@
 > JAVA版本: 17 (SpringBoot_v3.5.9)
 
 ### 下面是一些本项目的参考文档：<br>
-[查看用户API文档（UserAPI）](USER_API.md) 
+[查看用户API文档（UserAPI）](Document/USER_API.md) 
 <br>
-[查看数据库结构（UserAPI）](SQL.md)
+[查看数据库结构（UserAPI）](Document/SQL.md)
 
-### 数据表之前的关系：
-![img.png](img.png)
+### 关系参考图：
+![img.png](Document/img/img.png)
 
-![img_1.png](img_1.png)
+![img_1.png](Document/img/img_1.png)
 

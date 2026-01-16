@@ -20,6 +20,11 @@ public class SysUser {
     private String username;
 
     /**
+     * 昵称（非空）
+     */
+    private String nickname;
+
+    /**
      * 密码（加密后存储，非空）
      */
     private String password;
@@ -54,4 +59,5 @@ public class SysUser {
      */
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
 }

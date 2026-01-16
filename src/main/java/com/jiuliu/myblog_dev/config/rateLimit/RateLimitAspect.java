@@ -33,7 +33,7 @@ public class RateLimitAspect {
         String ip = getClientIpAddress(request);
         String limitKey = buildLimitKey(joinPoint, rateLimit, ip);
         long now = System.currentTimeMillis();
-        long periodMs = rateLimit.period() * 1000L;
+        long periodMs = (long) rateLimit.period() * 60 * 1000;
 
         // 记录限流键构建信息（生产环境默认不开启 DEBUG）
         log.debug("构建限流键: [key={}, ip={}, method={}]", limitKey, ip, getMethodSignature(joinPoint));

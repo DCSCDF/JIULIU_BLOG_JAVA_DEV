@@ -1,9 +1,10 @@
-package com.jiuliu.myblog_dev.mapper.user;
+package com.jiuliu.myblog_dev.mapper.blog.tag;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jiuliu.myblog_dev.entity.user.role.SysRole;
 import org.apache.ibatis.annotations.Mapper;
 
+
 @Mapper
-public interface SysRoleMapper extends BaseMapper<SysRole> {
+public interface SysTagMapper extends BaseMapper<SysRole> {
 }
