@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.controller.role;
+package com.jiuliu.myblog_dev.controller.user.role;
 
 public class RoleController {
 //    @RestController

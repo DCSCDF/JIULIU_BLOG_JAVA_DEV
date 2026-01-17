@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.controller.comment;
+package com.jiuliu.myblog_dev.controller.blog.comment;
 
 public class CommentController {
 //    @RestController

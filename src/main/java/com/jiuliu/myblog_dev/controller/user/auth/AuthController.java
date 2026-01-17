@@ -1,10 +1,10 @@
-package com.jiuliu.myblog_dev.controller.auth;
+package com.jiuliu.myblog_dev.controller.user.auth;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.jiuliu.myblog_dev.config.rateLimit.RateLimit;
-import com.jiuliu.myblog_dev.dto.user.ChangePasswordDTO;
-import com.jiuliu.myblog_dev.dto.user.LoginDTO;
-import com.jiuliu.myblog_dev.service.auth.AuthService;
+import com.jiuliu.myblog_dev.dto.user.auth.ChangePasswordDTO;
+import com.jiuliu.myblog_dev.dto.user.auth.LoginDTO;
+import com.jiuliu.myblog_dev.service.user.auth.AuthService;
 import jakarta.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +59,6 @@ public class AuthController {
     @PostMapping("/register")
     public Map<String, Object> register() {
         // TODO: 补充注册逻辑
-        return Map.of("code", 501, "message", "未实现", "data", null);
+        return Map.of("code", 501, "message", "未实现", "data", "null");
     }
 }

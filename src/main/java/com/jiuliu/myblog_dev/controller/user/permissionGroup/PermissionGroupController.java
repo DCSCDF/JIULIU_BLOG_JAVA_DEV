@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.controller.permissionGroup;
+package com.jiuliu.myblog_dev.controller.user.permissionGroup;
 
 public class PermissionGroupController {
 //    @RestController

@@ -1,9 +1,8 @@
-package com.jiuliu.myblog_dev.service.auth;
+package com.jiuliu.myblog_dev.service.user.auth;
 
 
-import com.jiuliu.myblog_dev.dto.user.ChangePasswordDTO;
-import com.jiuliu.myblog_dev.dto.user.LoginDTO;
-import com.jiuliu.myblog_dev.entity.user.SysUser;
+import com.jiuliu.myblog_dev.dto.user.auth.ChangePasswordDTO;
+import com.jiuliu.myblog_dev.dto.user.auth.LoginDTO;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.controller.permission;
+package com.jiuliu.myblog_dev.controller.user.permission;
 
 public class PermissionController {
 //    @RestController

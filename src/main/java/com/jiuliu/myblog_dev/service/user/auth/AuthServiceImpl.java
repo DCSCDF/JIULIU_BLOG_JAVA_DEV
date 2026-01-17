@@ -1,10 +1,10 @@
-package com.jiuliu.myblog_dev.service.auth;
+package com.jiuliu.myblog_dev.service.user.auth;
 
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.jiuliu.myblog_dev.config.user.RsaKeyConfig;
-import com.jiuliu.myblog_dev.dto.user.ChangePasswordDTO;
-import com.jiuliu.myblog_dev.dto.user.LoginDTO;
+import com.jiuliu.myblog_dev.dto.user.auth.ChangePasswordDTO;
+import com.jiuliu.myblog_dev.dto.user.auth.LoginDTO;
 import com.jiuliu.myblog_dev.entity.user.SysUser;
 import com.jiuliu.myblog_dev.mapper.user.SysUserMapper;
 import com.jiuliu.myblog_dev.utils.RsaUtils;

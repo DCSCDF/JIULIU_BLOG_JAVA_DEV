@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.controller.categories;
+package com.jiuliu.myblog_dev.controller.blog.categories;
 
 public class CategoryController {
 //    @RestController

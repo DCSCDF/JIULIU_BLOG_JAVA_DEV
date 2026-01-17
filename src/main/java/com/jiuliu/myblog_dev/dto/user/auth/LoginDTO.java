@@ -1,5 +1,5 @@
-// com.jiuliu.myblog_dev.dto.user.LoginDTO.java
-package com.jiuliu.myblog_dev.dto.user;
+// com.jiuliu.myblog_dev.dto.user.auth.LoginDTO.java
+package com.jiuliu.myblog_dev.dto.user.auth;
 
 import lombok.Data;
 

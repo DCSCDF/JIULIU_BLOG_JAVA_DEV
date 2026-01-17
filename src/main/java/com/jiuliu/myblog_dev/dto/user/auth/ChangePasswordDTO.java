@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.dto.user;
+package com.jiuliu.myblog_dev.dto.user.auth;
 
 
 import lombok.Data;
