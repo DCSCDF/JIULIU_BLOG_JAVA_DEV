@@ -58,7 +58,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public Map<String, Object> register() {
-        // TODO: 补充注册逻辑
+        // TODO: 补充register逻辑 等等....
         return Map.of("code", 501, "message", "未实现", "data", "null");
     }
 }

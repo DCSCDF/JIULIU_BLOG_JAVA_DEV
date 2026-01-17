@@ -1,9 +1,10 @@
 ## 重构的 JAVA 后端
 
-<hr>
+[![My Skills](https://skillicons.dev/icons?i=java,spring,mysql,git&theme=light)](https://skillicons.dev)
 
-> 数据库: MySQL (8.4.0) <br>
-> JAVA版本: 17 (SpringBoot_v3.5.9)
+> MySQL:`8.4.0`, 
+> Java:`17` ,
+> SpringBoot:`v3.5.9`
 
 ### 下面是一些本项目的参考文档：<br>
 [查看用户API文档（UserAPI）](Document/USER_API.md) 
