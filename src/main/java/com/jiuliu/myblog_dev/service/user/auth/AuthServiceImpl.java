@@ -88,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
             return getErrorResponse("用户名不存在");
         }
 
-        if (!ValidationHelper.validatePassword(rawPassword)) {
+        if (ValidationHelper.validatePassword(rawPassword)) {
             return getErrorResponse("密码格式错误");
         }
 
@@ -168,7 +168,7 @@ public class AuthServiceImpl implements AuthService {
             return getErrorResponse("密码格式错误");
         }
 
-        if (!ValidationHelper.validatePassword(rawNewPassword)) {
+        if (ValidationHelper.validatePassword(rawNewPassword)) {
             return getErrorResponse("新密码格式不符合要求");
         }
 

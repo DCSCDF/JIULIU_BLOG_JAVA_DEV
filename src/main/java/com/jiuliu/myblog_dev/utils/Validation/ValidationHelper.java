@@ -53,19 +53,19 @@ public class ValidationHelper {
     public static boolean validatePassword(String password) {
         if (!StringUtils.hasText(password)) {
             log.warn("密码不能为空");
-            return false;
+            return true;
         }
 
         // 检查长度
         if (password.length() < 6 || password.length() > 20) {
             log.warn("密码长度必须在6-20之间");
-            return false;
+            return true;
         }
 
         // 检查特殊字符
         if (containsInvalidChars(password)) {
             log.warn("密码不能包含空格、引号、分号等特殊字符");
-            return false;
+            return true;
         }
 
         // 检查是否同时包含字母和数字
@@ -74,20 +74,18 @@ public class ValidationHelper {
 
         if (!hasLetter) {
             log.warn("密码必须包含字母");
-            return false;
+            return true;
         }
 
         if (!hasDigit) {
             log.warn("密码必须包含数字");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
      * 验证邮箱
-     *
-     * @return
      */
     public static boolean validateEmail(String email) {
         if (!StringUtils.hasText(email)) {
