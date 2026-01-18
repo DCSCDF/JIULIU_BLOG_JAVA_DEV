@@ -1,5 +1,6 @@
 package com.jiuliu.myblog_dev.controller.user.auth;
 
+
 import cn.dev33.satoken.stp.StpUtil;
 import com.jiuliu.myblog_dev.utils.rateLimit.RateLimit;
 import com.jiuliu.myblog_dev.dto.user.auth.ChangePasswordDTO;
@@ -18,6 +19,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+
     @GetMapping("/public-key")
     public Map<String, Object> getPublicKey() {
         return authService.getPublicKey();
@@ -29,6 +31,7 @@ public class AuthController {
         return authService.login(dto);
     }
 
+    //    @SaCheckPermission("system:user")
     @GetMapping("/is-logged-in")
     @RateLimit(count = 40, period = 15)
     public Map<String, Object> isLoggedIn() {

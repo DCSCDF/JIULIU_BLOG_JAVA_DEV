@@ -1,10 +1,6 @@
-<center> 
-
 ## 重构的 JAVA 后端
+
 [![My Skills](https://skillicons.dev/icons?i=java,spring,mysql,git&theme=light)](https://skillicons.dev)
-
-</center>
-
 
 ---
 
@@ -65,6 +61,7 @@ StpUtil.checkRoleOr("ADMIN", "SUPER_ADMIN");
 @RequestMapping("/api/admin")
 public class AdminController {
 
+    // 参考数据库的 sys_permission 表中的 system:user:list 权限
     @SaCheckPermission("system:user:list")
     @GetMapping("/users")
     public SaResult getUserList() {
@@ -80,3 +77,4 @@ public class AdminController {
     }
 }
 ```
+

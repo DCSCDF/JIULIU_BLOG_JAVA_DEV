@@ -2,13 +2,15 @@ package com.jiuliu.myblog_dev.mapper.user.permission;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jiuliu.myblog_dev.entity.user.permission.SysPermission;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
-
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
-
-@Repository
+@Mapper
 public interface SysPermissionMapper extends BaseMapper<SysPermission> {
-    List<SysPermission> selectPermissionsByRoleId(@Param("roleId") Long roleId);
+
+    @Select("SELECT p.* FROM sys_permission p " +
+            "JOIN sys_role_permission rp ON p.id = rp.permission_id " +
+            "WHERE rp.role_id = #{roleId}")
+    List<SysPermission> selectPermissionsByRoleId(Long roleId);
 }
