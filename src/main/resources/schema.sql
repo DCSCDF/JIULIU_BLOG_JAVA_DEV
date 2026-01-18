@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS sys_user (
     status INT DEFAULT 1 COMMENT '状态：0=禁用，1=启用',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
 -- 角色表
 CREATE TABLE IF NOT EXISTS sys_role (
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS sys_role (
     status INT DEFAULT 1 COMMENT '状态：0=禁用，1=启用',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色表';
 
 -- 权限表
 CREATE TABLE IF NOT EXISTS sys_permission (
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS sys_permission (
     status INT DEFAULT 1 COMMENT '状态：0=禁用，1=启用',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='权限表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='权限表';
 
 -- 用户角色关联表
 CREATE TABLE IF NOT EXISTS sys_user_role (
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS sys_user_role (
     UNIQUE KEY uk_user_role (user_id, role_id) COMMENT '防止重复关联',
     FOREIGN KEY (user_id) REFERENCES sys_user(id) ON DELETE CASCADE,
     FOREIGN KEY (role_id) REFERENCES sys_role(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户-角色关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户-角色关联表';
 
 -- 角色权限关联表
 CREATE TABLE IF NOT EXISTS sys_role_permission (
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS sys_role_permission (
     UNIQUE KEY uk_role_permission (role_id, permission_id) COMMENT '防止重复关联',
     FOREIGN KEY (role_id) REFERENCES sys_role(id) ON DELETE CASCADE,
     FOREIGN KEY (permission_id) REFERENCES sys_permission(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色-权限关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色-权限关联表';
 
 -- 权限组表（用于组织权限）
 CREATE TABLE IF NOT EXISTS sys_permission_group (
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS sys_permission_group (
     status INT DEFAULT 1 COMMENT '状态：0=禁用，1=启用',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='权限组表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='权限组表';
 
 -- 权限-权限组关联表
 CREATE TABLE IF NOT EXISTS sys_permission_group_item (
@@ -96,9 +96,9 @@ CREATE TABLE IF NOT EXISTS sys_permission_group_item (
     UNIQUE KEY uk_group_permission (group_id, permission_id) COMMENT '防止重复关联',
     FOREIGN KEY (group_id) REFERENCES sys_permission_group(id) ON DELETE CASCADE,
     FOREIGN KEY (permission_id) REFERENCES sys_permission(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='权限-权限组关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='权限-权限组关联表';
 
--- 角色权限组关联表（批量分配权限）
+-- 角色权限组关联表
 CREATE TABLE IF NOT EXISTS sys_role_permission_group (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '关联ID',
     role_id BIGINT NOT NULL COMMENT '角色ID',
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS sys_role_permission_group (
     UNIQUE KEY uk_role_group (role_id, group_id) COMMENT '防止重复关联',
     FOREIGN KEY (role_id) REFERENCES sys_role(id) ON DELETE CASCADE,
     FOREIGN KEY (group_id) REFERENCES sys_permission_group(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色-权限组关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色-权限组关联表';
 
 -- 分类表
 CREATE TABLE IF NOT EXISTS sys_category (
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS sys_category (
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     is_hidden TINYINT(1) DEFAULT 0 COMMENT '是否隐藏：0=显示，1=隐藏',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章分类表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章分类表';
 
 -- 博客/文章表
 CREATE TABLE IF NOT EXISTS sys_blog (
@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS sys_blog (
 
     FOREIGN KEY (category_id) REFERENCES sys_category(id) ON DELETE SET NULL,
     FOREIGN KEY (author_id) REFERENCES sys_user(id) ON DELETE SET NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='博客文章表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='博客文章表';
 
 -- 评论表
 CREATE TABLE IF NOT EXISTS sys_comment (
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS sys_comment (
 
     FOREIGN KEY (blog_id) REFERENCES sys_blog(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES sys_user(id) ON DELETE SET NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表';
 
 -- 评论点赞表
 CREATE TABLE IF NOT EXISTS sys_comment_like (
@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS sys_comment_like (
     UNIQUE KEY uk_comment_user (comment_id, user_id) COMMENT '防止重复点赞',
     FOREIGN KEY (comment_id) REFERENCES sys_comment(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES sys_user(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论点赞表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论点赞表';
 
 -- 标签表
 CREATE TABLE IF NOT EXISTS sys_tag (
@@ -184,7 +184,7 @@ CREATE TABLE IF NOT EXISTS sys_tag (
     name VARCHAR(50) NOT NULL UNIQUE COMMENT '标签名称',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='标签表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='标签表';
 
 -- 文章-标签关联表
 CREATE TABLE IF NOT EXISTS sys_blog_tag (
@@ -196,7 +196,7 @@ CREATE TABLE IF NOT EXISTS sys_blog_tag (
     UNIQUE KEY uk_blog_tag (blog_id, tag_id) COMMENT '防止重复关联',
     FOREIGN KEY (blog_id) REFERENCES sys_blog(id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES sys_tag(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章-标签关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章-标签关联表';
 
 -- 文章点赞表
 CREATE TABLE IF NOT EXISTS sys_blog_like (
@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS sys_blog_like (
     UNIQUE KEY uk_blog_user (blog_id, user_id) COMMENT '防止重复点赞',
     FOREIGN KEY (blog_id) REFERENCES sys_blog(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES sys_user(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章点赞表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章点赞表';
 
 -- 创建索引 删除已存在的索引
 DROP INDEX IF EXISTS idx_user_status ON sys_user;
@@ -513,7 +513,7 @@ WHERE g.name = '用户管理组'
     WHERE pgi.group_id = g.id AND pgi.permission_id = p.id
 );
 
--- 为角色分配权限组
+-- 为角色分配权限组（ADMIN角色）
 INSERT IGNORE INTO sys_role_permission_group (role_id, group_id)
 SELECT r.id, g.id
 FROM sys_role r
@@ -523,3 +523,14 @@ WHERE r.code = 'ADMIN'
     SELECT 1 FROM sys_role_permission_group rpg
     WHERE rpg.role_id = r.id AND rpg.group_id = g.id
 );
+
+-- 自动同步权限组中的权限到角色权限表
+INSERT IGNORE INTO sys_role_permission (role_id, permission_id)
+SELECT rpg.role_id, pgi.permission_id
+FROM sys_role_permission_group rpg
+         JOIN sys_permission_group_item pgi ON rpg.group_id = pgi.group_id
+WHERE NOT EXISTS (
+    SELECT 1 FROM sys_role_permission rp
+    WHERE rp.role_id = rpg.role_id AND rp.permission_id = pgi.permission_id
+);
+

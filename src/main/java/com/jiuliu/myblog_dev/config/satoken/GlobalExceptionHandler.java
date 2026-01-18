@@ -1,6 +1,5 @@
 package com.jiuliu.myblog_dev.config.satoken;
 
-
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.dev33.satoken.exception.NotLoginException;
@@ -21,42 +20,35 @@ public class GlobalExceptionHandler {
     /**
      * 处理鉴权异常
      */
+    @SuppressWarnings("unused")
     @ExceptionHandler(value = {NotLoginException.class, NotRoleException.class, NotPermissionException.class})
     public SaResult handleAuthException(Exception e) {
-        // 安全记录异常 不返回堆栈给前端
-        log.warn("鉴权异常: {}", e.getMessage());
-        log.debug("鉴权异常详情:", e);
 
-        // 根据异常类型返回不同的错误信息
+        log.warn("鉴权异常: {}", e.getClass().getSimpleName());
+        log.info("鉴权异常详情: {}", e.getMessage()); // 不记录堆栈，避免日志过大
+
+        //  返回标准化错误信息（不包含异常详情）
         if (e instanceof NotLoginException) {
-            SaResult result = SaResult.error("未登录，请先登录");
-            result.setCode(401);
-            return result;
+            return SaResult.error("未登录，请先登录").setCode(401);
         } else if (e instanceof NotRoleException) {
-            SaResult result = SaResult.error("没有角色权限");
-            result.setCode(403);
-            return result;
+            return SaResult.error("没有角色权限").setCode(403);
         } else if (e instanceof NotPermissionException) {
-            SaResult result = SaResult.error("没有权限");
-            result.setCode(403);
-            return result;
+            return SaResult.error("没有权限").setCode(403);
         }
-        SaResult result = SaResult.error("系统错误");
-        result.setCode(500);
-        return result;
+        return SaResult.error("系统错误").setCode(500);
     }
 
     /**
-     * 处理其他异常
+     * 处理其他系统异常
      */
+    @SuppressWarnings("unused")
     @ExceptionHandler
     public SaResult handleException(Exception e) {
-        // 安全记录异常
-        log.error("系统异常: {}", e.getMessage());
-        log.error("系统异常详情:", e);
+        // 1. 严格安全记录：只记录异常类型和关键信息
+        log.error("系统异常: {}", e.getClass().getSimpleName());
+        log.error("系统异常详情: {}", e.getMessage());
 
-        SaResult result = SaResult.error("系统错误: " + e.getMessage());
-        result.setCode(500);
-        return result;
+        // 2. 返回统一错误信息（避免暴露实现细节）
+        return SaResult.error("系统错误").setCode(500);
     }
 }
