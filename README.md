@@ -8,7 +8,7 @@
 ![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.9-6DB33F?logo=springboot&logoColor=white)
 
-> ### 项目参考文档
+> ### API 与数据库等文档
 > - [用户API文档（UserAPI）](Document/USER_API.md)
 > - [数据库结构（UserAPI）](Document/SQL.md)
 
@@ -17,3 +17,62 @@
 ### 关系参考图：
 ![用户关系图](Document/img/img.png)
 ![数据库ER图](Document/img/img_1.png)
+
+
+### 鉴权 API 说明
+您可以这样使用鉴权：
+
+```java
+// 获取权限列表
+List<String> permissionList = StpUtil.getPermissionList();
+
+// 判断权限
+boolean hasPermission = StpUtil.hasPermission("system:user:list");
+
+// 检查权限（未通过则抛出异常）
+StpUtil.checkPermission("system:user:list");
+
+// 检查多个权限（全部通过）
+StpUtil.checkPermissionAnd("system:user:list", "system:user:create");
+
+// 检查多个权限（任一通过）
+StpUtil.checkPermissionOr("system:user:list", "system:user:delete");
+
+// 获取角色列表
+List<String> roleList = StpUtil.getRoleList();
+
+// 判断角色
+boolean hasRole = StpUtil.hasRole("ADMIN");
+
+// 检查角色（未通过则抛出异常）
+StpUtil.checkRole("ADMIN");
+
+// 检查多个角色（全部通过）
+StpUtil.checkRoleAnd("ADMIN", "SUPER_ADMIN");
+
+// 检查多个角色（任一通过）
+StpUtil.checkRoleOr("ADMIN", "SUPER_ADMIN");
+```
+
+控制器中使用权限验证：
+
+```java
+@RestController
+@RequestMapping("/api/admin")
+public class AdminController {
+
+    @SaCheckPermission("system:user:list")
+    @GetMapping("/users")
+    public SaResult getUserList() {
+        // 业务逻辑
+        return SaResult.ok("用户列表");
+    }
+
+    @SaCheckRole("ADMIN")
+    @PostMapping("/users")
+    public SaResult createUser() {
+        // 业务逻辑
+        return SaResult.ok("用户创建成功");
+    }
+}
+```

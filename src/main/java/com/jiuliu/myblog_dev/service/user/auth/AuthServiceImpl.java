@@ -2,7 +2,7 @@ package com.jiuliu.myblog_dev.service.user.auth;
 
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.jiuliu.myblog_dev.config.user.RsaKeyConfig;
+import com.jiuliu.myblog_dev.config.RsaKeyConfig;
 import com.jiuliu.myblog_dev.dto.user.auth.ChangePasswordDTO;
 import com.jiuliu.myblog_dev.dto.user.auth.LoginDTO;
 import com.jiuliu.myblog_dev.entity.user.SysUser;

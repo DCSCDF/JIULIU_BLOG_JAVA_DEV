@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.config.rateLimit;
+package com.jiuliu.myblog_dev.utils.rateLimit;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

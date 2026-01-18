@@ -1,7 +1,7 @@
 package com.jiuliu.myblog_dev.controller.user.auth;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.jiuliu.myblog_dev.config.rateLimit.RateLimit;
+import com.jiuliu.myblog_dev.utils.rateLimit.RateLimit;
 import com.jiuliu.myblog_dev.dto.user.auth.ChangePasswordDTO;
 import com.jiuliu.myblog_dev.dto.user.auth.LoginDTO;
 import com.jiuliu.myblog_dev.service.user.auth.AuthService;
@@ -39,7 +39,7 @@ public class AuthController {
     @GetMapping("/profile")
     @RateLimit(count = 40, period = 15)
     public Map<String, Object> getUserProfile() {
-        Long userId = StpUtil.getLoginIdAsLong(); // 注意：这里仍需 Sa-Token 工具获取 ID
+        Long userId = StpUtil.getLoginIdAsLong(); // 这里仍需 Sa-Token 工具获取 ID
         return authService.getUserProfile(userId);
     }
 

@@ -1,4 +1,4 @@
-package com.jiuliu.myblog_dev.config.user;
+package com.jiuliu.myblog_dev.config;
 
 import lombok.Getter;
 import org.slf4j.Logger;
