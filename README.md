@@ -1,6 +1,10 @@
-## 重构的 JAVA 后端
+<center> 
 
+## 重构的 JAVA 后端
 [![My Skills](https://skillicons.dev/icons?i=java,spring,mysql,git&theme=light)](https://skillicons.dev)
+
+</center>
+
 
 ---
 
